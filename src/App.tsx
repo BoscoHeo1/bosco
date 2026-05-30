@@ -45,7 +45,36 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  const isAdmin = user?.email === 'heoalchan@goedu.kr' && user?.emailVerified;
+  const isAdmin = user?.email === 'heoalchan@goedu.kr';
+
+  const handleMigrate = async () => {
+    try {
+      const { initializeApp } = await import('firebase/app');
+      const { getFirestore, collection, getDocs, setDoc, doc } = await import('firebase/firestore');
+      
+      const oldConfig = {
+        projectId: "gen-lang-client-0745529210",
+        apiKey: "AIzaSyAwFuZOKUUOYujJNxDFUYnFdVvX2rZoJms",
+        authDomain: "gen-lang-client-0745529210.firebaseapp.com",
+        firestoreDatabaseId: "ai-studio-2532edae-ec74-4245-879c-48e2a740b378"
+      };
+      
+      const oldApp = initializeApp(oldConfig, "oldApp");
+      const oldDb = getFirestore(oldApp, oldConfig.firestoreDatabaseId);
+      
+      const oldSnapshot = await getDocs(collection(oldDb, "services"));
+      let migrated = 0;
+      for (const oldDoc of oldSnapshot.docs) {
+        const data = oldDoc.data();
+        await setDoc(doc(db, "services", oldDoc.id), data);
+        migrated++;
+      }
+      alert(`성공적으로 ${migrated}개의 이전 데이터를 복구했습니다!`);
+    } catch (e: any) {
+      alert('복구 중 오류 발생: ' + e.message);
+    }
+  };
+
 
   // Visit Counting
   useEffect(() => {
@@ -228,6 +257,14 @@ export default function App() {
           
           {isAdmin && (
             <div className="flex items-center gap-3">
+              <button
+                onClick={handleMigrate}
+                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-xl transition-all shadow-md flex items-center gap-2"
+                title="이전 데이터 가져오기"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span className="hidden sm:inline">이전 데이터 복구</span>
+              </button>
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="px-4 py-2 bg-slate-900 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md flex items-center gap-2"

@@ -47,35 +47,6 @@ export default function App() {
 
   const isAdmin = user?.email === 'heoalchan@goedu.kr';
 
-  const handleMigrate = async () => {
-    try {
-      const { initializeApp } = await import('firebase/app');
-      const { getFirestore, collection, getDocs, setDoc, doc } = await import('firebase/firestore');
-      
-      const oldConfig = {
-        projectId: "gen-lang-client-0745529210",
-        apiKey: "AIzaSyAwFuZOKUUOYujJNxDFUYnFdVvX2rZoJms",
-        authDomain: "gen-lang-client-0745529210.firebaseapp.com",
-        firestoreDatabaseId: "ai-studio-2532edae-ec74-4245-879c-48e2a740b378"
-      };
-      
-      const oldApp = initializeApp(oldConfig, "oldApp");
-      const oldDb = getFirestore(oldApp, oldConfig.firestoreDatabaseId);
-      
-      const oldSnapshot = await getDocs(collection(oldDb, "services"));
-      let migrated = 0;
-      for (const oldDoc of oldSnapshot.docs) {
-        const data = oldDoc.data();
-        await setDoc(doc(db, "services", oldDoc.id), data);
-        migrated++;
-      }
-      alert(`성공적으로 ${migrated}개의 이전 데이터를 복구했습니다!`);
-    } catch (e: any) {
-      alert('복구 중 오류 발생: ' + e.message);
-    }
-  };
-
-
   // Visit Counting
   useEffect(() => {
     const trackVisit = async () => {
@@ -258,14 +229,6 @@ export default function App() {
           {isAdmin && (
             <div className="flex items-center gap-3">
               <button
-                onClick={handleMigrate}
-                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-xl transition-all shadow-md flex items-center gap-2"
-                title="이전 데이터 가져오기"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span className="hidden sm:inline">이전 데이터 복구</span>
-              </button>
-              <button
                 onClick={() => setIsModalOpen(true)}
                 className="px-4 py-2 bg-slate-900 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md flex items-center gap-2"
                 id="header-add-btn"
@@ -304,7 +267,7 @@ export default function App() {
 
       <div className="flex flex-1">
         {/* Sidebar */}
-        <aside className="w-64 bg-white/50 dark:bg-neutral-900/50 border-r border-slate-200 dark:border-neutral-800 p-8 hidden md:flex flex-col justify-between fixed h-[calc(100vh-80px)] overflow-y-auto">
+        <aside className="w-64 bg-white dark:bg-neutral-950 border-r border-slate-200 dark:border-neutral-800 p-8 hidden md:flex flex-col justify-between fixed h-[calc(100vh-80px)] overflow-y-auto">
           <nav className="space-y-8">
             <section>
               <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 ml-2">보기 모드</p>
@@ -369,8 +332,8 @@ export default function App() {
         <main className="flex-1 md:ml-64 p-6 md:p-10 flex flex-col gap-8">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div>
-              <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white">나의 웹 서비스</h2>
-              <p className="text-slate-500 dark:text-neutral-400 mt-1 font-medium">관리 중인 모든 웹앱과 서비스 목록입니다.</p>
+              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">나의 웹 서비스</h2>
+              <p className="text-slate-600 dark:text-neutral-400 mt-2 font-medium">관리 중인 모든 웹앱과 서비스 목록입니다.</p>
             </div>
             
             <div className="relative w-full lg:max-w-md group">
@@ -416,13 +379,13 @@ export default function App() {
                       <motion.div
                         whileHover={{ scale: 0.98 }}
                         onClick={() => setIsModalOpen(true)}
-                        className="bg-slate-100/50 dark:bg-neutral-900/50 p-6 rounded-2xl border-2 border-dashed border-slate-300 dark:border-neutral-800 flex flex-col items-center justify-center group cursor-pointer hover:bg-slate-200/50 dark:hover:bg-neutral-800/80 transition-colors h-full min-h-[180px]"
+                        className="bg-slate-50 dark:bg-neutral-900 p-6 rounded-2xl border-2 border-dashed border-slate-300 dark:border-neutral-800 flex flex-col items-center justify-center group cursor-pointer hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors h-full min-h-[180px]"
                         id="grid-add-btn"
                       >
                         <div className="w-10 h-10 rounded-full border-2 border-slate-400 border-dashed flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
                           <Plus className="w-5 h-5 text-slate-500" />
                         </div>
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-tighter">새 서비스 등록</span>
+                        <span className="text-xs font-bold text-slate-600 uppercase tracking-tighter">새 서비스 등록</span>
                       </motion.div>
                     )}
                   </motion.div>

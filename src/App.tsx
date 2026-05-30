@@ -109,8 +109,23 @@ export default function App() {
   const handleLogin = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login failed:", error);
+      const errorMessage = error?.code || error?.message || String(error);
+      
+      if (errorMessage.includes('auth/unauthorized-domain') || errorMessage.includes('unauthorized-domain')) {
+        alert(
+          "🔒 [도메인 승인 필요]\n\n" +
+          "현재 배포된 Netlify 도메인이 Firebase Authentication 승인 도메인 목록에 등록되지 않았습니다.\n\n" +
+          "해결 방법:\n" +
+          "1. 구글 Firebase Console(https://console.firebase.google.com/)에 접속합니다.\n" +
+          "2. 해당 프로젝트의 [Authentication] -> [Settings(설정)] -> [Authorized domains(승인된 도메인)]으로 시퀀스를 이동합니다.\n" +
+          "3. [Add domain(도메인 추가)]를 클릭하고 사용자님의 Netlify 도메인 주소(예: xxxxx.netlify.app)를 추가해주세요.\n\n" +
+          "등록 후 1~2분 뒤 다시 시도하시면 정상적으로 로그인이 완료됩니다!"
+        );
+      } else {
+        alert(`로그인 중 오류가 발생했습니다.\n오류 코드: ${errorMessage}`);
+      }
     }
   };
 

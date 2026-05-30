@@ -1,10 +1,8 @@
 {
-  "projectId": "gen-lang-client-0745529210",
-  "appId": "1:826005372857:web:7c650ea4a5b7a4f3204068",
-  "apiKey": "AIzaSyAwFuZOKUUOYujJNxDFUYnFdVvX2rZoJms",
-  "authDomain": "gen-lang-client-0745529210.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-2532edae-ec74-4245-879c-48e2a740b378",
-  "storageBucket": "gen-lang-client-0745529210.firebasestorage.app",
-  "messagingSenderId": "826005372857",
-  "measurementId": ""
+  "projectId": "bosco-school-life",
+  "appId": "1:681503731620:web:7223fc0a4afea00decdb31",
+  "apiKey": "AIzaSyAc21ukIRMeTZZ-dPHYVbY6c2gDW5d5TIQ",
+  "authDomain": "bosco-school-life.firebaseapp.com",
+  "storageBucket": "bosco-school-life.firebasestorage.app",
+  "messagingSenderId": "681503731620"
 }

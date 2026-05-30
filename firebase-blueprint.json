@@ -1,0 +1,39 @@
+{
+  "entities": {
+    "Service": {
+      "title": "Service",
+      "description": "A web service or application link shared by teachers.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The name of the service" },
+        "description": { "type": "string", "description": "A brief description of the service" },
+        "url": { "type": "string", "format": "uri", "description": "The URL of the service" },
+        "category": { "type": "string", "description": "The category of the service (e.g., class, admin)" },
+        "ownerId": { "type": "string", "description": "The UID of the user who created this service" },
+        "clickCount": { "type": "integer", "description": "Number of times the service was clicked" },
+        "createdAt": { "type": "number", "description": "Timestamp of creation" },
+        "updatedAt": { "type": "number", "description": "Timestamp of last update" }
+      },
+      "required": ["name", "url", "category", "ownerId", "createdAt"]
+    },
+    "GlobalStats": {
+      "title": "GlobalStats",
+      "description": "Global portal statistics",
+      "type": "object",
+      "properties": {
+        "visitCount": { "type": "integer", "description": "Total number of portal visits" }
+      },
+      "required": ["visitCount"]
+    }
+  },
+  "firestore": {
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Collection of all shared web services."
+    },
+    "/stats/{statId}": {
+      "schema": "GlobalStats",
+      "description": "Global statistics like visit counts."
+    }
+  }
+}

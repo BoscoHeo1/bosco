@@ -1,0 +1,445 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Plus, Search, LayoutGrid, List, Sparkles, Github, LogIn, LogOut, User as UserIcon } from 'lucide-react';
+import { AppService } from './types';
+import AppCard from './components/AppCard';
+import AddAppModal from './components/AddAppModal';
+import { auth, db, googleProvider, signInWithPopup, onAuthStateChanged, User, handleFirestoreError, OperationType } from './lib/firebase';
+import { 
+  collection, 
+  onSnapshot, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  doc, 
+  query, 
+  orderBy,
+  serverTimestamp,
+  Timestamp,
+  increment,
+  setDoc,
+  getDoc
+} from 'firebase/firestore';
+
+export default function App() {
+  const [services, setServices] = useState<AppService[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingService, setEditingService] = useState<AppService | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [visitCount, setVisitCount] = useState<number>(0);
+
+  // Auth Status
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setIsLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const isAdmin = user?.email === 'heoalchan@goedu.kr' && user?.emailVerified;
+
+  // Visit Counting
+  useEffect(() => {
+    const trackVisit = async () => {
+      const statsRef = doc(db, 'stats', 'portal');
+      const path = 'stats/portal';
+      try {
+        // Use setDoc with merge for atomic increment/init
+        await setDoc(statsRef, { 
+          visitCount: increment(1) 
+        }, { merge: true });
+      } catch (e: any) {
+        handleFirestoreError(e, OperationType.WRITE, path);
+      }
+    };
+
+    trackVisit();
+
+    // Listen to visit count
+    const unsubscribe = onSnapshot(doc(db, 'stats', 'portal'), (snapshot) => {
+      if (snapshot.exists()) {
+        setVisitCount(snapshot.data().visitCount || 0);
+      }
+    }, (error) => {
+       handleFirestoreError(error, OperationType.GET, 'stats/portal');
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Fetch from Firestore (Public read)
+  useEffect(() => {
+    const path = 'services';
+    const q = query(collection(db, path), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedServices = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as AppService[];
+      setServices(fetchedServices);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, path);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const categories = useMemo(() => {
+    const cats = services.map(s => s.category).filter(Boolean);
+    return Array.from(new Set(cats));
+  }, [services]);
+
+  const filteredServices = useMemo(() => {
+    return services.filter(s => 
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [services, searchQuery]);
+
+  const handleLogin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  };
+
+  const handleLogout = () => auth.signOut();
+
+  const handleAddService = async (newService: Omit<AppService, 'id' | 'createdAt' | 'ownerId'>) => {
+    if (!user) return;
+    
+    const path = 'services';
+    try {
+      await addDoc(collection(db, path), {
+        ...newService,
+        ownerId: user.uid,
+        createdAt: Date.now(),
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, path);
+    }
+  };
+
+  const handleUpdateService = async (updatedService: AppService) => {
+    if (!user) return;
+
+    const path = `services/${updatedService.id}`;
+    try {
+      const serviceDoc = doc(db, 'services', updatedService.id);
+      await updateDoc(serviceDoc, {
+        name: updatedService.name,
+        description: updatedService.description,
+        url: updatedService.url,
+        category: updatedService.category,
+        updatedAt: Date.now()
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, path);
+    }
+  };
+
+  const handleEditClick = (service: AppService) => {
+    if (isAdmin) {
+      setEditingService(service);
+      setIsModalOpen(true);
+    } else {
+      alert('관리자만 수정할 수 있습니다.');
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingService(null);
+  };
+
+  const handleDeleteService = async (id: string) => {
+    if (!user) return;
+    
+    // Check ownership
+    const service = services.find(s => s.id === id);
+    if (!service || !isAdmin) {
+      alert('삭제 권한이 없습니다.');
+      return;
+    }
+
+    if (confirm('이 서비스를 목록에서 삭제하시겠습니까?')) {
+      const path = `services/${id}`;
+      try {
+        await deleteDoc(doc(db, 'services', id));
+      } catch (error) {
+        handleFirestoreError(error, OperationType.DELETE, path);
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 text-slate-900 dark:text-neutral-100 font-sans flex flex-col">
+      {/* Header */}
+      <header className="h-20 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-md border-b border-slate-200 dark:border-neutral-900 px-6 md:px-10 flex items-center justify-between sticky top-0 z-50">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <Sparkles className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold leading-none tracking-tight">보스코쌤의 학교생활</h1>
+            <p className="hidden sm:block text-[10px] text-slate-400 mt-1 font-bold uppercase tracking-widest">포털 디렉토리</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4 pr-4 border-r border-slate-200 dark:border-neutral-800">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span className="text-sm font-semibold">{services.length}개 서비스</span>
+            </div>
+            {isAdmin && (
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                <span className="text-sm font-semibold">누적 방문 {visitCount.toLocaleString()}</span>
+              </div>
+            )}
+          </div>
+          
+          {isAdmin && (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="px-4 py-2 bg-slate-900 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md flex items-center gap-2"
+                id="header-add-btn"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">추가</span>
+              </button>
+              
+              <div className="flex items-center gap-2 pl-3 border-l border-slate-200 dark:border-neutral-800">
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full border border-slate-200 dark:border-neutral-800" referrerPolicy="no-referrer" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-neutral-800 flex items-center justify-center">
+                    <UserIcon className="w-4 h-4 text-slate-400" />
+                  </div>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                  title="로그아웃"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {user && !isAdmin && (
+             <div className="flex items-center gap-3">
+               <span className="text-xs text-slate-400 font-medium hidden sm:inline">{user.displayName} 선생님</span>
+               <button onClick={handleLogout} className="text-slate-400 hover:text-red-500 transition-colors"><LogOut className="w-4 h-4" /></button>
+             </div>
+          )}
+        </div>
+      </header>
+
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        <aside className="w-64 bg-white/50 dark:bg-neutral-900/50 border-r border-slate-200 dark:border-neutral-800 p-8 hidden md:flex flex-col justify-between fixed h-[calc(100vh-80px)] overflow-y-auto">
+          <nav className="space-y-8">
+            <section>
+              <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 ml-2">보기 모드</p>
+              <div className="p-1 bg-slate-100 dark:bg-neutral-950 rounded-xl flex">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`flex-1 flex justify-center py-2 rounded-lg transition-all ${
+                    viewMode === 'grid' ? 'bg-white dark:bg-neutral-800 shadow-sm text-indigo-600' : 'text-slate-400'
+                  }`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`flex-1 flex justify-center py-2 rounded-lg transition-all ${
+                    viewMode === 'list' ? 'bg-white dark:bg-neutral-800 shadow-sm text-indigo-600' : 'text-slate-400'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+            </section>
+
+            <section>
+              <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 ml-2">카테고리</p>
+              <div className="space-y-1">
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="w-full text-left px-4 py-2 rounded-lg text-slate-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 font-medium flex items-center gap-2 transition-colors text-sm"
+                >
+                  <span className="w-2 h-2 rounded-full bg-slate-400" />
+                  전체 보기
+                </button>
+                {categories.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setSearchQuery(c)}
+                    className="w-full text-left px-4 py-2 rounded-lg text-slate-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 font-medium flex items-center gap-2 transition-colors text-sm"
+                  >
+                    <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </section>
+          </nav>
+
+          <div className="p-4 bg-white dark:bg-neutral-950 rounded-xl border border-slate-100 dark:border-neutral-800 shadow-sm">
+            <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-3">활성화 상태</p>
+            <div className="h-1.5 w-full bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: '100%' }}
+                className="h-full bg-emerald-500" 
+              />
+            </div>
+            <p className="text-[10px] font-bold mt-2 text-slate-500 uppercase tracking-tight">모든 서비스 정상</p>
+          </div>
+        </aside>
+
+        {/* Content */}
+        <main className="flex-1 md:ml-64 p-6 md:p-10 flex flex-col gap-8">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white">나의 웹 서비스</h2>
+              <p className="text-slate-500 dark:text-neutral-400 mt-1 font-medium">관리 중인 모든 웹앱과 서비스 목록입니다.</p>
+            </div>
+            
+            <div className="relative w-full lg:max-w-md group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+              <input
+                type="text"
+                placeholder="검색어를 입력해 주세요..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-11 pr-4 py-3 rounded-xl bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all shadow-sm font-medium text-sm"
+                id="search-input"
+              />
+            </div>
+          </div>
+
+          <div className="min-h-[400px]">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-40">
+                <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (
+              <AnimatePresence mode="popLayout">
+                {filteredServices.length > 0 ? (
+                  <motion.div
+                    layout
+                    className={
+                      viewMode === 'grid' 
+                        ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6"
+                        : "flex flex-col gap-4"
+                    }
+                    id="services-container"
+                  >
+                    {filteredServices.map((service: AppService) => (
+                      <AppCard 
+                        key={service.id} 
+                        service={service} 
+                        onEdit={handleEditClick}
+                        onDelete={handleDeleteService} 
+                      />
+                    ))}
+                    
+                    {viewMode === 'grid' && isAdmin && (
+                      <motion.div
+                        whileHover={{ scale: 0.98 }}
+                        onClick={() => setIsModalOpen(true)}
+                        className="bg-slate-100/50 dark:bg-neutral-900/50 p-6 rounded-2xl border-2 border-dashed border-slate-300 dark:border-neutral-800 flex flex-col items-center justify-center group cursor-pointer hover:bg-slate-200/50 dark:hover:bg-neutral-800/80 transition-colors h-full min-h-[180px]"
+                        id="grid-add-btn"
+                      >
+                        <div className="w-10 h-10 rounded-full border-2 border-slate-400 border-dashed flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                          <Plus className="w-5 h-5 text-slate-500" />
+                        </div>
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-tighter">새 서비스 등록</span>
+                      </motion.div>
+                    )}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex flex-col items-center justify-center py-24 text-center rounded-3xl bg-white dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800 shadow-sm"
+                    id="empty-state"
+                  >
+                    <div className="w-16 h-16 bg-slate-50 dark:bg-neutral-800 rounded-2xl flex items-center justify-center mb-6">
+                      <Search className="w-8 h-8 text-slate-300 dark:text-neutral-700" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-white">검색 결과가 없습니다</h3>
+                    <p className="text-slate-500 dark:text-neutral-400 text-sm font-medium mt-1">
+                      {searchQuery ? `"${searchQuery}"에 해당하는 서비스를 찾을 수 없습니다.` : "등록된 서비스가 없습니다."}
+                    </p>
+                    {!searchQuery && isAdmin && (
+                      <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold shadow-lg hover:shadow-indigo-500/20 hover:bg-indigo-700 transition-all"
+                        id="empty-state-add-btn"
+                      >
+                        첫 서비스 등록하기
+                      </button>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            )}
+          </div>
+
+          <footer className="py-10 mt-10 border-t border-slate-200 dark:border-neutral-900 flex flex-col sm:flex-row justify-between items-center gap-6 text-slate-400">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+              <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest">
+                <span>© 2026</span>
+                <span className="text-slate-300">/</span>
+                <span>보스코쌤의 학교생활 포털</span>
+              </div>
+              
+              {!user && (
+                <button 
+                  onClick={handleLogin}
+                  className="text-[10px] font-bold uppercase tracking-widest hover:text-indigo-500 transition-colors cursor-pointer"
+                >
+                  관리자 로그인
+                </button>
+              )}
+            </div>
+            
+            <div className="flex items-center gap-6">
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 dark:hover:text-white transition-colors">
+                <Github className="w-5 h-5" />
+              </a>
+            </div>
+          </footer>
+        </main>
+      </div>
+
+      <AddAppModal 
+        isOpen={isModalOpen} 
+        onClose={handleCloseModal} 
+        onAdd={handleAddService} 
+        onUpdate={handleUpdateService}
+        categories={categories}
+        initialData={editingService}
+      />
+    </div>
+  );
+}
+

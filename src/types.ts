@@ -13,3 +13,14 @@ export interface AppService {
   clickCount?: number;
   createdAt: number;
 }
+
+export interface Inquiry {
+  id: string;
+  title: string;
+  content: string;
+  category: string; // 'error' | 'feature' | 'general'
+  contact?: string;
+  userName?: string;
+  createdAt: number;
+  status: 'pending' | 'in_progress' | 'resolved';
+}

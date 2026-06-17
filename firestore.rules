@@ -33,6 +33,18 @@ service cloud.firestore {
              data.createdAt is number;
     }
 
+    function isValidInquiry(data) {
+      return data.keys().hasAll(['title', 'content', 'category', 'createdAt', 'status']) &&
+             data.keys().size() <= 10 &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.content is string && data.content.size() > 0 && data.content.size() <= 5000 &&
+             data.category is string && data.category.size() > 0 && data.category.size() <= 100 &&
+             data.createdAt is number &&
+             data.status is string && (data.status == 'pending' || data.status == 'in_progress' || data.status == 'resolved') &&
+             (!data.keys().hasAny(['contact']) || (data.contact is string && data.contact.size() <= 200)) &&
+             (!data.keys().hasAny(['userName']) || (data.userName is string && data.userName.size() <= 100));
+    }
+
     match /services/{serviceId} {
       allow read: if true;
       allow create: if isAdmin() && isValidService(request.resource.data) && isValidId(serviceId);
@@ -43,6 +55,11 @@ service cloud.firestore {
                     (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['clickCount']) &&
                      request.resource.data.clickCount == resource.data.get('clickCount', 0) + 1);
       allow delete: if isAdmin();
+    }
+
+    match /inquiries/{inquiryId} {
+      allow create: if isValidInquiry(request.resource.data) && isValidId(inquiryId);
+      allow read, update, delete: if isAdmin();
     }
 
     match /stats/{statId} {

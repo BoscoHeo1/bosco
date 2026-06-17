@@ -24,6 +24,21 @@
         "visitCount": { "type": "integer", "description": "Total number of portal visits" }
       },
       "required": ["visitCount"]
+    },
+    "Inquiry": {
+      "title": "Inquiry",
+      "description": "An error report or support inquiry submitted by users.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Subject of the inquiry" },
+        "content": { "type": "string", "description": "Detailed description of the issue or question" },
+        "category": { "type": "string", "description": "Type of inquiry (error, feature, general)" },
+        "contact": { "type": "string", "description": "User's email or phone number for reply" },
+        "userName": { "type": "string", "description": "Name of the submitter" },
+        "createdAt": { "type": "number", "description": "Submission timestamp" },
+        "status": { "type": "string", "description": "Current status (pending, in_progress, resolved)", "enum": ["pending", "in_progress", "resolved"] }
+      },
+      "required": ["title", "content", "category", "createdAt", "status"]
     }
   },
   "firestore": {
@@ -34,6 +49,10 @@
     "/stats/{statId}": {
       "schema": "GlobalStats",
       "description": "Global statistics like visit counts."
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": "Inquiry",
+      "description": "User feedback, error reports, and inquiry tickets."
     }
   }
 }

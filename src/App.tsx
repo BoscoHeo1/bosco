@@ -5,10 +5,12 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Search, LayoutGrid, List, Sparkles, Github, LogIn, LogOut, User as UserIcon } from 'lucide-react';
+import { Plus, Search, LayoutGrid, List, Sparkles, Github, LogIn, LogOut, User as UserIcon, HelpCircle, Inbox } from 'lucide-react';
 import { AppService } from './types';
 import AppCard from './components/AppCard';
 import AddAppModal from './components/AddAppModal';
+import InquiryForm from './components/InquiryForm';
+import AdminInquiryDashboard from './components/AdminInquiryDashboard';
 import { auth, db, googleProvider, signInWithPopup, onAuthStateChanged, User, handleFirestoreError, OperationType } from './lib/firebase';
 import { 
   collection, 
@@ -35,6 +37,7 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [visitCount, setVisitCount] = useState<number>(0);
+  const [activeView, setActiveView] = useState<'services' | 'inquiry' | 'admin-inquiries'>('services');
 
   // Auth Status
   useEffect(() => {
@@ -270,49 +273,100 @@ export default function App() {
         <aside className="w-64 bg-white dark:bg-neutral-950 border-r border-slate-200 dark:border-neutral-800 p-8 hidden md:flex flex-col justify-between fixed h-[calc(100vh-80px)] overflow-y-auto">
           <nav className="space-y-8">
             <section>
-              <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 ml-2">보기 모드</p>
-              <div className="p-1 bg-slate-100 dark:bg-neutral-950 rounded-xl flex">
+              <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 ml-2">메뉴</p>
+              <div className="space-y-1">
                 <button
-                  onClick={() => setViewMode('grid')}
-                  className={`flex-1 flex justify-center py-2 rounded-lg transition-all ${
-                    viewMode === 'grid' ? 'bg-white dark:bg-neutral-800 shadow-sm text-indigo-600' : 'text-slate-400'
+                  onClick={() => { setActiveView('services'); setSearchQuery(''); }}
+                  className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2.5 transition-colors text-sm ${
+                    activeView === 'services' && !searchQuery
+                      ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400'
+                      : 'text-slate-600 dark:text-neutral-400 hover:bg-slate-55 dark:hover:bg-neutral-800/60'
                   }`}
                 >
-                  <LayoutGrid className="w-4 h-4" />
+                  <LayoutGrid className="w-4 h-4 text-indigo-500" />
+                  웹 서비스 목록
                 </button>
                 <button
-                  onClick={() => setViewMode('list')}
-                  className={`flex-1 flex justify-center py-2 rounded-lg transition-all ${
-                    viewMode === 'list' ? 'bg-white dark:bg-neutral-800 shadow-sm text-indigo-600' : 'text-slate-400'
+                  onClick={() => setActiveView('inquiry')}
+                  className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2.5 transition-colors text-sm ${
+                    activeView === 'inquiry'
+                      ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400'
+                      : 'text-slate-600 dark:text-neutral-400 hover:bg-slate-55 dark:hover:bg-neutral-800/60'
                   }`}
                 >
-                  <List className="w-4 h-4" />
+                  <HelpCircle className="w-4 h-4 text-emerald-500" />
+                  오류 및 문의 접수
                 </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => setActiveView('admin-inquiries')}
+                    className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2.5 transition-all text-sm ${
+                      activeView === 'admin-inquiries'
+                        ? 'bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400'
+                        : 'text-slate-600 dark:text-neutral-400 hover:bg-slate-55 dark:hover:bg-neutral-800/60'
+                    }`}
+                  >
+                    <Inbox className="w-4 h-4 text-orange-500" />
+                    <span>문의 내역 관리</span>
+                  </button>
+                )}
               </div>
             </section>
 
-            <section>
-              <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 ml-2">카테고리</p>
-              <div className="space-y-1">
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="w-full text-left px-4 py-2 rounded-lg text-slate-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 font-medium flex items-center gap-2 transition-colors text-sm"
-                >
-                  <span className="w-2 h-2 rounded-full bg-slate-400" />
-                  전체 보기
-                </button>
-                {categories.map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => setSearchQuery(c)}
-                    className="w-full text-left px-4 py-2 rounded-lg text-slate-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 font-medium flex items-center gap-2 transition-colors text-sm"
-                  >
-                    <span className="w-2 h-2 rounded-full bg-indigo-500" />
-                    {c}
-                  </button>
-                ))}
-              </div>
-            </section>
+            {activeView === 'services' && (
+              <>
+                <section>
+                  <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 ml-2">보기 모드</p>
+                  <div className="p-1 bg-slate-100 dark:bg-neutral-900 rounded-xl flex">
+                    <button
+                      onClick={() => setViewMode('grid')}
+                      className={`flex-1 flex justify-center py-2 rounded-lg transition-all ${
+                        viewMode === 'grid' ? 'bg-white dark:bg-neutral-800 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-400'
+                      }`}
+                      title="그리드 뷰"
+                    >
+                      <LayoutGrid className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`flex-1 flex justify-center py-2 rounded-lg transition-all ${
+                        viewMode === 'list' ? 'bg-white dark:bg-neutral-800 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-400'
+                      }`}
+                      title="리스트 뷰"
+                    >
+                      <List className="w-4 h-4" />
+                    </button>
+                  </div>
+                </section>
+
+                <section>
+                  <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 ml-2">카테고리</p>
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => { setActiveView('services'); setSearchQuery(''); }}
+                      className={`w-full text-left px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors text-sm ${
+                        !searchQuery ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-600 dark:text-neutral-400'
+                      }`}
+                    >
+                      <span className="w-2 h-2 rounded-full bg-slate-400" />
+                      전체 보기
+                    </button>
+                    {categories.map((c) => (
+                      <button
+                        key={c}
+                        onClick={() => { setActiveView('services'); setSearchQuery(c); }}
+                        className={`w-full text-left px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors text-sm ${
+                          searchQuery === c ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-600 dark:text-neutral-400'
+                        }`}
+                      >
+                        <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              </>
+            )}
           </nav>
 
           <div className="p-4 bg-white dark:bg-neutral-950 rounded-xl border border-slate-100 dark:border-neutral-800 shadow-sm">
@@ -330,92 +384,118 @@ export default function App() {
 
         {/* Content */}
         <main className="flex-1 md:ml-64 p-6 md:p-10 flex flex-col gap-8">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          {activeView === 'services' && (
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+              <div>
+                <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">나의 웹 서비스</h2>
+                <p className="text-slate-600 dark:text-neutral-400 mt-2 font-medium">관리 중인 모든 웹앱과 서비스 목록입니다.</p>
+              </div>
+              
+              <div className="relative w-full lg:max-w-md group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                <input
+                  type="text"
+                  placeholder="검색어를 입력해 주세요..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all shadow-sm font-medium text-sm"
+                  id="search-input"
+                />
+              </div>
+            </div>
+          )}
+
+          {activeView === 'inquiry' && (
             <div>
-              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">나의 웹 서비스</h2>
-              <p className="text-slate-600 dark:text-neutral-400 mt-2 font-medium">관리 중인 모든 웹앱과 서비스 목록입니다.</p>
+              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">오류 및 문의 접수</h2>
+              <p className="text-slate-600 dark:text-neutral-400 mt-2 font-medium">오류 제보, 기능 건의 등 보스코쌤에게 직접 피드백을 전달할 수 있습니다.</p>
             </div>
-            
-            <div className="relative w-full lg:max-w-md group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-              <input
-                type="text"
-                placeholder="검색어를 입력해 주세요..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 rounded-xl bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all shadow-sm font-medium text-sm"
-                id="search-input"
-              />
+          )}
+
+          {activeView === 'admin-inquiries' && isAdmin && (
+            <div>
+              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">의견 및 문의 관리</h2>
+              <p className="text-slate-600 dark:text-neutral-400 mt-2 font-medium">선생님들이 전송한 피드백을 실시간으로 관리하는 대시보드입니다.</p>
             </div>
-          </div>
+          )}
 
           <div className="min-h-[400px]">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-40">
-                <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : (
-              <AnimatePresence mode="popLayout">
-                {filteredServices.length > 0 ? (
-                  <motion.div
-                    layout
-                    className={
-                      viewMode === 'grid' 
-                        ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6"
-                        : "flex flex-col gap-4"
-                    }
-                    id="services-container"
-                  >
-                    {filteredServices.map((service: AppService) => (
-                      <AppCard 
-                        key={service.id} 
-                        service={service} 
-                        onEdit={handleEditClick}
-                        onDelete={handleDeleteService} 
-                      />
-                    ))}
-                    
-                    {viewMode === 'grid' && isAdmin && (
-                      <motion.div
-                        whileHover={{ scale: 0.98 }}
-                        onClick={() => setIsModalOpen(true)}
-                        className="bg-slate-50 dark:bg-neutral-900 p-6 rounded-2xl border-2 border-dashed border-slate-300 dark:border-neutral-800 flex flex-col items-center justify-center group cursor-pointer hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors h-full min-h-[180px]"
-                        id="grid-add-btn"
-                      >
-                        <div className="w-10 h-10 rounded-full border-2 border-slate-400 border-dashed flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                          <Plus className="w-5 h-5 text-slate-500" />
-                        </div>
-                        <span className="text-xs font-bold text-slate-600 uppercase tracking-tighter">새 서비스 등록</span>
-                      </motion.div>
-                    )}
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex flex-col items-center justify-center py-24 text-center rounded-3xl bg-white dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800 shadow-sm"
-                    id="empty-state"
-                  >
-                    <div className="w-16 h-16 bg-slate-50 dark:bg-neutral-800 rounded-2xl flex items-center justify-center mb-6">
-                      <Search className="w-8 h-8 text-slate-300 dark:text-neutral-700" />
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-800 dark:text-white">검색 결과가 없습니다</h3>
-                    <p className="text-slate-500 dark:text-neutral-400 text-sm font-medium mt-1">
-                      {searchQuery ? `"${searchQuery}"에 해당하는 서비스를 찾을 수 없습니다.` : "등록된 서비스가 없습니다."}
-                    </p>
-                    {!searchQuery && isAdmin && (
-                      <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold shadow-lg hover:shadow-indigo-500/20 hover:bg-indigo-700 transition-all"
-                        id="empty-state-add-btn"
-                      >
-                        첫 서비스 등록하기
-                      </button>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            {activeView === 'services' && (
+              isLoading ? (
+                <div className="flex items-center justify-center py-40">
+                  <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : (
+                <AnimatePresence mode="popLayout">
+                  {filteredServices.length > 0 ? (
+                    <motion.div
+                      layout
+                      className={
+                        viewMode === 'grid' 
+                          ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6"
+                          : "flex flex-col gap-4"
+                      }
+                      id="services-container"
+                    >
+                      {filteredServices.map((service: AppService) => (
+                        <AppCard 
+                          key={service.id} 
+                          service={service} 
+                          onEdit={handleEditClick}
+                          onDelete={handleDeleteService} 
+                        />
+                      ))}
+                      
+                      {viewMode === 'grid' && isAdmin && (
+                        <motion.div
+                          whileHover={{ scale: 0.98 }}
+                          onClick={() => setIsModalOpen(true)}
+                          className="bg-slate-50 dark:bg-neutral-900 p-6 rounded-2xl border-2 border-dashed border-slate-300 dark:border-neutral-800 flex flex-col items-center justify-center group cursor-pointer hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors h-full min-h-[180px]"
+                          id="grid-add-btn"
+                        >
+                          <div className="w-10 h-10 rounded-full border-2 border-slate-400 border-dashed flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <Plus className="w-5 h-5 text-slate-500" />
+                          </div>
+                          <span className="text-xs font-bold text-slate-600 uppercase tracking-tighter">새 서비스 등록</span>
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="flex flex-col items-center justify-center py-24 text-center rounded-3xl bg-white dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800 shadow-sm"
+                      id="empty-state"
+                    >
+                      <div className="w-16 h-16 bg-slate-50 dark:bg-neutral-800 rounded-2xl flex items-center justify-center mb-6">
+                        <Search className="w-8 h-8 text-slate-300 dark:text-neutral-700" />
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-800 dark:text-white">검색 결과가 없습니다</h3>
+                      <p className="text-slate-500 dark:text-neutral-400 text-sm font-medium mt-1">
+                        {searchQuery ? `"${searchQuery}"에 해당하는 서비스를 찾을 수 없습니다.` : "등록된 서비스가 없습니다."}
+                      </p>
+                      {!searchQuery && isAdmin && (
+                        <button
+                          onClick={() => setIsModalOpen(true)}
+                          className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold shadow-lg hover:shadow-indigo-500/20 hover:bg-indigo-700 transition-all"
+                          id="empty-state-add-btn"
+                        >
+                          첫 서비스 등록하기
+                        </button>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              )
+            )}
+
+            {activeView === 'inquiry' && (
+              <InquiryForm user={user} onGoBack={() => setActiveView('services')} />
+            )}
+
+            {activeView === 'admin-inquiries' && isAdmin && (
+              <AdminInquiryDashboard />
             )}
           </div>
 
@@ -423,18 +503,34 @@ export default function App() {
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
               <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest">
                 <span>© 2026</span>
-                <span className="text-slate-300">/</span>
+                <span className="text-slate-300 flex items-center justify-center">/</span>
                 <span>보스코쌤의 학교생활 포털</span>
               </div>
               
-              {!user && (
+              <div className="flex items-center gap-3">
                 <button 
-                  onClick={handleLogin}
+                  onClick={() => setActiveView('inquiry')}
                   className="text-[10px] font-bold uppercase tracking-widest hover:text-indigo-500 transition-colors cursor-pointer"
                 >
-                  관리자 로그인
+                  오류 및 문의 제보
                 </button>
-              )}
+                <span className="text-slate-300">/</span>
+                {!user ? (
+                  <button 
+                    onClick={handleLogin}
+                    className="text-[10px] font-bold uppercase tracking-widest hover:text-indigo-500 transition-colors cursor-pointer"
+                  >
+                    관리자 로그인
+                  </button>
+                ) : (
+                  <button 
+                    onClick={handleLogout}
+                    className="text-[10px] font-bold uppercase tracking-widest hover:text-red-500 transition-colors cursor-pointer"
+                  >
+                    로그아웃
+                  </button>
+                )}
+              </div>
             </div>
             
             <div className="flex items-center gap-6">

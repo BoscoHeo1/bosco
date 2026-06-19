@@ -34,8 +34,9 @@ export default function AppCard({ service, onEdit, onDelete }: AppCardProps) {
 
   return (
     <motion.div
+      key={service.id}
       layout
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       whileHover={{ y: -4 }}
@@ -45,7 +46,7 @@ export default function AppCard({ service, onEdit, onDelete }: AppCardProps) {
     >
       <div className="flex items-start justify-between mb-4">
         <span 
-          className="px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wide bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400"
+          className="px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wide bg-indigo-50 text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300"
         >
           {service.category || '기본'}
         </span>
@@ -81,16 +82,16 @@ export default function AppCard({ service, onEdit, onDelete }: AppCardProps) {
       </div>
 
       <div className="flex-1">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-neutral-100 mb-1 line-clamp-1">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-neutral-100 mb-1.5 line-clamp-1">
           {service.name}
         </h3>
-        <p className="text-sm text-slate-600 leading-relaxed dark:text-neutral-400 min-h-[2.5rem] whitespace-pre-wrap break-words">
+        <p className="text-sm text-slate-700 leading-relaxed dark:text-neutral-300 min-h-[2.5rem] whitespace-pre-wrap break-words font-medium">
           {service.description || '설명이 없습니다.'}
         </p>
       </div>
 
       <div className="mt-6 pt-4 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between">
-        <code className="text-[10px] text-slate-400 font-mono truncate max-w-[120px]">
+        <code className="text-[10px] text-slate-500 dark:text-neutral-400 font-mono truncate max-w-[120px]">
           {service.url.replace(/^https?:\/\//, '')}
         </code>
         <a

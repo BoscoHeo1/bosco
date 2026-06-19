@@ -280,7 +280,7 @@ export default function App() {
                   className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2.5 transition-colors text-sm ${
                     activeView === 'services' && !searchQuery
                       ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400'
-                      : 'text-slate-600 dark:text-neutral-400 hover:bg-slate-55 dark:hover:bg-neutral-800/60'
+                      : 'text-slate-700 dark:text-neutral-300 hover:bg-slate-100/70 dark:hover:bg-neutral-800/40'
                   }`}
                 >
                   <LayoutGrid className="w-4 h-4 text-indigo-500" />
@@ -291,7 +291,7 @@ export default function App() {
                   className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2.5 transition-colors text-sm ${
                     activeView === 'inquiry'
                       ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400'
-                      : 'text-slate-600 dark:text-neutral-400 hover:bg-slate-55 dark:hover:bg-neutral-800/60'
+                      : 'text-slate-700 dark:text-neutral-300 hover:bg-slate-100/70 dark:hover:bg-neutral-800/40'
                   }`}
                 >
                   <HelpCircle className="w-4 h-4 text-emerald-500" />
@@ -303,7 +303,7 @@ export default function App() {
                     className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2.5 transition-all text-sm ${
                       activeView === 'admin-inquiries'
                         ? 'bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400'
-                        : 'text-slate-600 dark:text-neutral-400 hover:bg-slate-55 dark:hover:bg-neutral-800/60'
+                        : 'text-slate-700 dark:text-neutral-300 hover:bg-slate-100/70 dark:hover:bg-neutral-800/40'
                     }`}
                   >
                     <Inbox className="w-4 h-4 text-orange-500" />
@@ -344,8 +344,8 @@ export default function App() {
                   <div className="space-y-1">
                     <button
                       onClick={() => { setActiveView('services'); setSearchQuery(''); }}
-                      className={`w-full text-left px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors text-sm ${
-                        !searchQuery ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-600 dark:text-neutral-400'
+                      className={`w-full text-left px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors text-sm ${
+                        !searchQuery ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-700 dark:text-neutral-300 hover:bg-slate-100/50 dark:hover:bg-neutral-900/40'
                       }`}
                     >
                       <span className="w-2 h-2 rounded-full bg-slate-400" />
@@ -355,8 +355,8 @@ export default function App() {
                       <button
                         key={c}
                         onClick={() => { setActiveView('services'); setSearchQuery(c); }}
-                        className={`w-full text-left px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors text-sm ${
-                          searchQuery === c ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-600 dark:text-neutral-400'
+                        className={`w-full text-left px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors text-sm ${
+                          searchQuery === c ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-700 dark:text-neutral-300 hover:bg-slate-100/50 dark:hover:bg-neutral-900/40'
                         }`}
                       >
                         <span className="w-2 h-2 rounded-full bg-indigo-500" />

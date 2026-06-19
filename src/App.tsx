@@ -426,10 +426,9 @@ export default function App() {
                   <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <AnimatePresence mode="popLayout">
+                <div id="services-grid-wrapper">
                   {filteredServices.length > 0 ? (
-                    <motion.div
-                      layout
+                    <div
                       className={
                         viewMode === 'grid' 
                           ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6"
@@ -447,8 +446,7 @@ export default function App() {
                       ))}
                       
                       {viewMode === 'grid' && isAdmin && (
-                        <motion.div
-                          whileHover={{ scale: 0.98 }}
+                        <div
                           onClick={() => setIsModalOpen(true)}
                           className="bg-slate-50 dark:bg-neutral-900 p-6 rounded-2xl border-2 border-dashed border-slate-300 dark:border-neutral-800 flex flex-col items-center justify-center group cursor-pointer hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors h-full min-h-[180px]"
                           id="grid-add-btn"
@@ -457,14 +455,11 @@ export default function App() {
                             <Plus className="w-5 h-5 text-slate-500" />
                           </div>
                           <span className="text-xs font-bold text-slate-600 uppercase tracking-tighter">새 서비스 등록</span>
-                        </motion.div>
+                        </div>
                       )}
-                    </motion.div>
+                    </div>
                   ) : (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
+                    <div
                       className="flex flex-col items-center justify-center py-24 text-center rounded-3xl bg-white dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800 shadow-sm"
                       id="empty-state"
                     >
@@ -484,9 +479,9 @@ export default function App() {
                           첫 서비스 등록하기
                         </button>
                       )}
-                    </motion.div>
+                    </div>
                   )}
-                </AnimatePresence>
+                </div>
               )
             )}
 

@@ -33,20 +33,14 @@ export default function AppCard({ service, onEdit, onDelete }: AppCardProps) {
   };
 
   return (
-    <motion.div
+    <div
       key={service.id}
-      layout
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2 }}
-      className="group relative flex flex-col p-6 rounded-2xl border bg-white shadow-sm transition-all duration-300 border-slate-200 hover:border-indigo-300 dark:bg-neutral-900 dark:border-neutral-800"
+      className="group relative flex flex-col p-6 rounded-2xl border bg-white shadow-sm hover:shadow-md transition-all duration-300 border-slate-200 hover:border-indigo-400 dark:bg-neutral-900 dark:border-neutral-800 dark:hover:border-indigo-500 hover:-translate-y-1"
       id={`service-card-${service.id}`}
     >
       <div className="flex items-start justify-between mb-4">
         <span 
-          className="px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wide bg-indigo-50 text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300"
+          className="px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wide bg-indigo-50 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-200"
         >
           {service.category || '기본'}
         </span>
@@ -82,10 +76,10 @@ export default function AppCard({ service, onEdit, onDelete }: AppCardProps) {
       </div>
 
       <div className="flex-1">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-neutral-100 mb-1.5 line-clamp-1">
+        <h3 className="text-lg font-extrabold text-slate-950 dark:text-white mb-1.5 line-clamp-1">
           {service.name}
         </h3>
-        <p className="text-sm text-slate-700 leading-relaxed dark:text-neutral-300 min-h-[2.5rem] whitespace-pre-wrap break-words font-medium">
+        <p className="text-sm text-slate-800 leading-relaxed dark:text-neutral-100 min-h-[2.5rem] whitespace-pre-wrap break-words font-semibold">
           {service.description || '설명이 없습니다.'}
         </p>
       </div>
@@ -106,6 +100,6 @@ export default function AppCard({ service, onEdit, onDelete }: AppCardProps) {
           <ExternalLink className="w-3 h-3" />
         </a>
       </div>
-    </motion.div>
+    </div>
   );
 }

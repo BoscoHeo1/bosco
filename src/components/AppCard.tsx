@@ -79,7 +79,7 @@ export default function AppCard({ service, onEdit, onDelete }: AppCardProps) {
         <h3 className="text-lg font-extrabold text-slate-950 dark:text-white mb-1.5 line-clamp-1">
           {service.name}
         </h3>
-        <p className="text-sm text-slate-800 leading-relaxed dark:text-neutral-100 min-h-[2.5rem] whitespace-pre-wrap break-words font-semibold">
+        <p className="text-sm text-slate-900 leading-relaxed dark:text-neutral-50 min-h-[2.5rem] whitespace-pre-wrap break-words font-medium tracking-tight">
           {service.description || '설명이 없습니다.'}
         </p>
       </div>

@@ -1,8 +1,5 @@
 {
   "projectId": "bosco-school-life",
-  "appId": "1:681503731620:web:7223fc0a4afea00decdb31",
   "apiKey": "AIzaSyAc21ukIRMeTZZ-dPHYVbY6c2gDW5d5TIQ",
-  "authDomain": "bosco-school-life.firebaseapp.com",
-  "storageBucket": "bosco-school-life.firebasestorage.app",
-  "messagingSenderId": "681503731620"
+  "authDomain": "bosco-school-life.firebaseapp.com"
 }

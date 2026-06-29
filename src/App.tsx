@@ -38,6 +38,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [visitCount, setVisitCount] = useState<number>(0);
   const [activeView, setActiveView] = useState<'services' | 'inquiry' | 'admin-inquiries'>('services');
+  const [firestoreError, setFirestoreError] = useState<string | null>(null);
 
   // Auth Status
   useEffect(() => {
@@ -89,8 +90,10 @@ export default function App() {
         ...doc.data()
       })) as AppService[];
       setServices(fetchedServices);
+      setFirestoreError(null);
     }, (error) => {
       handleFirestoreError(error, OperationType.LIST, path);
+      setFirestoreError(error instanceof Error ? error.message : String(error));
     });
 
     return () => unsubscribe();
@@ -102,11 +105,13 @@ export default function App() {
   }, [services]);
 
   const filteredServices = useMemo(() => {
-    return services.filter(s => 
-      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.category.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    return services.filter(s => {
+      const name = (s.name || '').toLowerCase();
+      const desc = (s.description || '').toLowerCase();
+      const cat = (s.category || '').toLowerCase();
+      const query = (searchQuery || '').toLowerCase();
+      return name.includes(query) || desc.includes(query) || cat.includes(query);
+    });
   }, [services, searchQuery]);
 
   const handleLogin = async () => {
@@ -421,7 +426,20 @@ export default function App() {
 
           <div className="min-h-[400px]">
             {activeView === 'services' && (
-              isLoading ? (
+              firestoreError ? (
+                <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-2xl p-8 text-center max-w-2xl mx-auto my-12 shadow-sm">
+                  <div className="w-12 h-12 bg-red-100 dark:bg-red-950/50 rounded-full flex items-center justify-center mx-auto mb-4 text-red-600 dark:text-red-400 font-bold text-xl">
+                    !
+                  </div>
+                  <h3 className="text-lg font-bold text-red-900 dark:text-red-200 mb-2">데이터를 불러오는 데 실패했습니다</h3>
+                  <p className="text-sm text-red-700 dark:text-red-300 font-medium mb-5">
+                    Firebase Firestore 데이터베이스에서 정보를 수집하지 못했습니다. 보안 규칙(firestore.rules)이 올바르게 배포되었는지 점검하시고, 다시 로그인하여 확인해보세요.
+                  </p>
+                  <code className="text-xs bg-red-100/50 dark:bg-red-950/80 px-3 py-2.5 rounded font-mono text-red-800 dark:text-red-300 block break-all text-left max-h-40 overflow-y-auto border border-red-200/50 dark:border-red-900/30">
+                    {firestoreError}
+                  </code>
+                </div>
+              ) : isLoading ? (
                 <div className="flex items-center justify-center py-40">
                   <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
                 </div>

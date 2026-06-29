@@ -302,7 +302,7 @@ export default function AdminInquiryDashboard() {
               {/* Content text */}
               <div className="flex-1 space-y-2">
                 <h4 className="text-[10px] text-slate-400 dark:text-neutral-500 font-bold uppercase tracking-wider">문의 상세 내용</h4>
-                <div className="text-sm text-slate-700 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap break-all border border-slate-100 dark:border-neutral-850 bg-slate-50/30 dark:bg-neutral-900/40 p-5 rounded-2xl min-h-[150px]">
+                <div className="text-sm text-slate-900 dark:text-neutral-50 leading-relaxed whitespace-pre-wrap break-all border border-slate-100 dark:border-neutral-850 bg-slate-50/30 dark:bg-neutral-900/40 p-5 rounded-2xl min-h-[150px] font-medium tracking-tight">
                   {selectedInquiry.content}
                 </div>
               </div>

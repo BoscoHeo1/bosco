@@ -8,17 +8,20 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, User 
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 
 // Load the local configuration file safely if it exists (using eager glob)
-// This prevents compilation errors in external build environments (like Grok, GitHub, Netlify)
-// when firebase-applet-config.json is ignored via .gitignore.
 const configs = (import.meta as any).glob('../../firebase-applet-config.json', { eager: true });
 const configKeys = Object.keys(configs);
 const firebaseConfigJson = configKeys.length > 0 ? (configs[configKeys[0]] as any).default : {};
 
+// Fallback configuration ensuring Netlify & external deployments never crash on missing config
+const DEFAULT_PROJECT_ID = "bosco-school-life";
+const DEFAULT_API_KEY = "AIzaSyAc21ukIRMeTZZ-dPHYVbY6c2gDW5d5TIQ";
+const DEFAULT_AUTH_DOMAIN = "bosco-school-life.firebaseapp.com";
+
 const firebaseConfig = {
-  apiKey: (import.meta as any).env.VITE_FIREBASE_API_KEY || firebaseConfigJson.apiKey,
-  authDomain: (import.meta as any).env.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfigJson.authDomain,
-  projectId: (import.meta as any).env.VITE_FIREBASE_PROJECT_ID || firebaseConfigJson.projectId,
-  firestoreDatabaseId: (import.meta as any).env.VITE_FIREBASE_DATABASE_ID || firebaseConfigJson.firestoreDatabaseId || "(default)"
+  apiKey: (import.meta as any).env?.VITE_FIREBASE_API_KEY || firebaseConfigJson.apiKey || DEFAULT_API_KEY,
+  authDomain: (import.meta as any).env?.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfigJson.authDomain || DEFAULT_AUTH_DOMAIN,
+  projectId: (import.meta as any).env?.VITE_FIREBASE_PROJECT_ID || firebaseConfigJson.projectId || DEFAULT_PROJECT_ID,
+  firestoreDatabaseId: (import.meta as any).env?.VITE_FIREBASE_DATABASE_ID || firebaseConfigJson.firestoreDatabaseId || "(default)"
 };
 
 const app = initializeApp(firebaseConfig);

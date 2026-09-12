@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Search, LayoutGrid, List, Sparkles, Github, LogIn, LogOut, User as UserIcon, HelpCircle, Inbox } from 'lucide-react';
+import { Plus, Search, LayoutGrid, List, Sparkles, Github, LogIn, LogOut, User as UserIcon, HelpCircle, Inbox, BookOpen, ShieldCheck, ClipboardCheck, Heart, Users } from 'lucide-react';
 import { AppService } from './types';
 import AppCard from './components/AppCard';
 import AddAppModal from './components/AddAppModal';
@@ -207,17 +207,15 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 text-slate-900 dark:text-neutral-100 font-sans flex flex-col">
+    <div className="min-h-screen bg-[#f8fbff] dark:bg-neutral-950 text-[#172b4d] dark:text-neutral-100 font-sans flex flex-col">
       {/* Header */}
-      <header className="h-20 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-md border-b border-slate-200 dark:border-neutral-900 px-6 md:px-10 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <Sparkles className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold leading-none tracking-tight">보스코쌤의 학교생활</h1>
-            <p className="hidden sm:block text-[10px] text-slate-400 mt-1 font-bold uppercase tracking-widest">포털 디렉토리</p>
-          </div>
+      <header className="min-h-20 bg-white dark:bg-neutral-950 border-b border-[#dce7f3] dark:border-neutral-900 px-4 py-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 sticky top-0 z-50">
+        <div className="flex items-center gap-2.5 text-slate-500 dark:text-neutral-400">
+          <BookOpen aria-hidden="true" className="h-5 w-5 shrink-0 text-blue-500" strokeWidth={1.8} />
+          <h1 className="text-sm font-semibold leading-6">
+            <span className="md:hidden">보스코쌤 · 학교생활 도구 모음</span>
+            <span className="hidden md:inline">선생님을 위한 학교생활 도구 모음</span>
+          </h1>
         </div>
 
         <div className="flex items-center gap-4">
@@ -273,39 +271,48 @@ export default function App() {
         </div>
       </header>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 w-full max-w-[1600px] mx-auto">
         {/* Sidebar */}
-        <aside className="w-64 bg-white dark:bg-neutral-950 border-r border-slate-200 dark:border-neutral-800 p-8 hidden md:flex flex-col justify-between fixed h-[calc(100vh-80px)] overflow-y-auto">
-          <nav className="space-y-8">
+        <aside className="w-64 shrink-0 bg-white dark:bg-neutral-950 border-r border-[#e0eafa] dark:border-neutral-800 px-5 py-7 hidden md:flex flex-col justify-between gap-8 sticky top-20 self-start h-[calc(100dvh-80px)] overflow-y-auto">
+          <nav className={activeView === 'services' ? 'space-y-6' : 'space-y-7'}>
+            {activeView === 'services' && (
+              <div className="flex items-center gap-3 px-2 pb-2">
+                <BookOpen aria-hidden="true" className="h-10 w-10 shrink-0 text-blue-600" strokeWidth={1.8} />
+                <div>
+                  <p className="text-xl font-extrabold tracking-tight text-[#081b4b] dark:text-white">보스코쌤</p>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-neutral-400">학교생활 도구 모음</p>
+                </div>
+              </div>
+            )}
             <section>
-              <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 ml-2">메뉴</p>
+              <p className="text-xs text-slate-500 font-semibold mb-3 ml-3">메뉴</p>
               <div className="space-y-1">
                 <button
                   onClick={() => { setActiveView('services'); setSearchQuery(''); }}
-                  className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2.5 transition-colors text-sm ${
+                  className={`w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-2.5 transition-colors text-sm ${
                     activeView === 'services' && !searchQuery
-                      ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400'
+                      ? 'bg-blue-600 text-white dark:bg-blue-600'
                       : 'text-slate-700 dark:text-neutral-300 hover:bg-slate-100/70 dark:hover:bg-neutral-800/40'
                   }`}
                 >
-                  <LayoutGrid className="w-4 h-4 text-indigo-500" />
+                  <LayoutGrid className="w-5 h-5 shrink-0 text-current" />
                   웹 서비스 목록
                 </button>
                 <button
                   onClick={() => setActiveView('inquiry')}
-                  className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2.5 transition-colors text-sm ${
+                  className={`w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-2.5 transition-colors text-sm ${
                     activeView === 'inquiry'
-                      ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400'
+                      ? 'bg-blue-600 text-white dark:bg-blue-600'
                       : 'text-slate-700 dark:text-neutral-300 hover:bg-slate-100/70 dark:hover:bg-neutral-800/40'
                   }`}
                 >
-                  <HelpCircle className="w-4 h-4 text-emerald-500" />
+                  <HelpCircle className="w-5 h-5 shrink-0 text-current" />
                   오류 및 문의 접수
                 </button>
                 {isAdmin && (
                   <button
                     onClick={() => setActiveView('admin-inquiries')}
-                    className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2.5 transition-all text-sm ${
+                    className={`w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-2.5 transition-all text-sm ${
                       activeView === 'admin-inquiries'
                         ? 'bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400'
                         : 'text-slate-700 dark:text-neutral-300 hover:bg-slate-100/70 dark:hover:bg-neutral-800/40'
@@ -321,50 +328,26 @@ export default function App() {
             {activeView === 'services' && (
               <>
                 <section>
-                  <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 ml-2">보기 모드</p>
-                  <div className="p-1 bg-slate-100 dark:bg-neutral-900 rounded-xl flex">
-                    <button
-                      onClick={() => setViewMode('grid')}
-                      className={`flex-1 flex justify-center py-2 rounded-lg transition-all ${
-                        viewMode === 'grid' ? 'bg-white dark:bg-neutral-800 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-400'
-                      }`}
-                      title="그리드 뷰"
-                    >
-                      <LayoutGrid className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setViewMode('list')}
-                      className={`flex-1 flex justify-center py-2 rounded-lg transition-all ${
-                        viewMode === 'list' ? 'bg-white dark:bg-neutral-800 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-400'
-                      }`}
-                      title="리스트 뷰"
-                    >
-                      <List className="w-4 h-4" />
-                    </button>
-                  </div>
-                </section>
-
-                <section>
-                  <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 ml-2">카테고리</p>
-                  <div className="space-y-1">
+                  <p className="text-sm font-semibold text-[#172b4d] dark:text-neutral-300 mb-3 px-3">카테고리</p>
+                  <div className="space-y-2">
                     <button
                       onClick={() => { setActiveView('services'); setSearchQuery(''); }}
-                      className={`w-full text-left px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors text-sm ${
-                        !searchQuery ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-700 dark:text-neutral-300 hover:bg-slate-100/50 dark:hover:bg-neutral-900/40'
+                      className={`w-full min-h-11 text-left px-3 py-2.5 rounded-xl border font-semibold flex items-center gap-3 transition-colors text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:ring-offset-2 ${
+                        !searchQuery ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950/40 dark:border-blue-800 dark:text-blue-300' : 'bg-white border-slate-200 text-[#172b4d] hover:bg-blue-50/60 hover:border-blue-200 dark:bg-neutral-950 dark:border-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-900'
                       }`}
                     >
-                      <span className="w-2 h-2 rounded-full bg-slate-400" />
+                      <span className="w-2 h-2 shrink-0 rounded-full bg-current opacity-60" />
                       전체 보기
                     </button>
                     {categories.map((c) => (
                       <button
                         key={c}
                         onClick={() => { setActiveView('services'); setSearchQuery(c); }}
-                        className={`w-full text-left px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors text-sm ${
-                          searchQuery === c ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-700 dark:text-neutral-300 hover:bg-slate-100/50 dark:hover:bg-neutral-900/40'
+                        className={`w-full min-h-11 text-left px-3 py-2.5 rounded-xl border font-semibold flex items-center gap-3 transition-colors text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:ring-offset-2 ${
+                          searchQuery === c ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950/40 dark:border-blue-800 dark:text-blue-300' : 'bg-white border-slate-200 text-[#172b4d] hover:bg-blue-50/60 hover:border-blue-200 dark:bg-neutral-950 dark:border-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-900'
                         }`}
                       >
-                        <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                        <span className="w-2 h-2 shrink-0 rounded-full bg-current opacity-60" />
                         {c}
                       </button>
                     ))}
@@ -374,7 +357,7 @@ export default function App() {
             )}
           </nav>
 
-          <div className="p-4 bg-white dark:bg-neutral-950 rounded-xl border border-slate-100 dark:border-neutral-800 shadow-sm">
+          <div className="p-4 bg-blue-50/60 dark:bg-neutral-950 rounded-xl border border-blue-100 dark:border-neutral-800">
             <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-3">활성화 상태</p>
             <div className="h-1.5 w-full bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
               <motion.div 
@@ -388,25 +371,87 @@ export default function App() {
         </aside>
 
         {/* Content */}
-        <main className="flex-1 md:ml-64 p-6 md:p-10 flex flex-col gap-8">
+        <main className={`flex-1 min-w-0 flex flex-col ${activeView === 'services' ? 'p-4 lg:p-6 gap-4 bg-white dark:bg-neutral-950' : 'p-4 sm:p-6 lg:p-8 xl:p-10 gap-8'}`}>
           {activeView === 'services' && (
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <section aria-labelledby="portal-hero-title" className="overflow-hidden rounded-3xl border border-blue-100 bg-[#eaf4ff] dark:border-blue-950 dark:bg-[#101f38]">
+              <div className="relative grid min-w-0 overflow-hidden lg:min-h-[300px] lg:grid-cols-[2fr_3fr] xl:min-h-[320px]">
+                <div className="relative z-10 min-w-0 px-5 pt-6 pb-3 sm:px-7 lg:self-center lg:py-7 lg:pr-0">
+                  <h2 id="portal-hero-title" className="text-3xl font-extrabold leading-[1.18] tracking-tight text-[#071747] sm:text-4xl xl:text-5xl dark:text-white">
+                    보스코쌤의<br />학교생활
+                  </h2>
+                  <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-[#233b65] sm:text-base sm:leading-7 dark:text-blue-100">
+                    아이들과 선생님을 위한<br />
+                    작지만 큰 변화, 수업이 더 즐거워지는 도구들
+                  </p>
+                </div>
+                <div className="relative h-52 min-w-0 overflow-hidden sm:h-60 lg:h-auto lg:self-stretch">
+                  <img
+                    src="/assets/bosco-teacher.png"
+                    alt="책상 위 노트북과 책 옆에서 아이들과 더 나은 내일을 응원하는 보스코쌤"
+                    width={1536}
+                    height={1024}
+                    decoding="async"
+                    className="absolute inset-0 block h-full w-full max-w-none origin-[50%_32%] scale-125 object-contain object-bottom"
+                  />
+                </div>
+              </div>
+              <div className="relative mx-3 mb-3 mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="flex min-w-0 items-center gap-3 rounded-xl border border-white/80 bg-white/90 px-3 py-3 dark:border-neutral-800 dark:bg-neutral-900">
+                  <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300"><ShieldCheck className="h-6 w-6" strokeWidth={1.8} /></span>
+                  <p className="text-sm leading-6 text-[#354c75] dark:text-neutral-300">바로 사용할 수 있는<br /><span className="font-bold text-[#172b4d] dark:text-white">웹앱 모음</span></p>
+                </div>
+                <div className="flex min-w-0 items-center gap-3 rounded-xl border border-white/80 bg-white/90 px-3 py-3 dark:border-neutral-800 dark:bg-neutral-900">
+                  <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-300"><ClipboardCheck className="h-6 w-6" strokeWidth={1.8} /></span>
+                  <p className="text-sm leading-6 text-[#354c75] dark:text-neutral-300">교실에서 검증된<br /><span className="font-bold text-[#172b4d] dark:text-white">실용적인 도구</span></p>
+                </div>
+                <div className="flex min-w-0 items-center gap-3 rounded-xl border border-white/80 bg-white/90 px-3 py-3 dark:border-neutral-800 dark:bg-neutral-900">
+                  <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-500 dark:bg-rose-950/50 dark:text-rose-300"><Heart className="h-6 w-6" strokeWidth={1.8} /></span>
+                  <p className="text-sm leading-6 text-[#354c75] dark:text-neutral-300">선생님과 아이들을 위한<br /><span className="font-bold text-[#172b4d] dark:text-white">지속적인 업데이트</span></p>
+                </div>
+                <div className="flex min-w-0 items-center gap-3 rounded-xl border border-white/80 bg-white/90 px-3 py-3 dark:border-neutral-800 dark:bg-neutral-900">
+                  <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600 dark:bg-violet-950/50 dark:text-violet-300"><Users className="h-6 w-6" strokeWidth={1.8} /></span>
+                  <p className="text-sm leading-6 text-[#354c75] dark:text-neutral-300">함께 만드는<br /><span className="font-bold text-[#172b4d] dark:text-white">더 나은 학교생활</span></p>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {activeView === 'services' && (
+            <div className="flex flex-col gap-3">
               <div>
-                <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">나의 웹 서비스</h2>
-                <p className="text-slate-600 dark:text-neutral-400 mt-2 font-medium">관리 중인 모든 웹앱과 서비스 목록입니다.</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold leading-tight tracking-tight text-[#071747] dark:text-white">앱 둘러보기</h2>
+                <p className="mt-2 text-sm leading-6 text-[#627799] dark:text-neutral-400">교실에서 바로 사용할 수 있는 다양한 도구들을 만나보세요.</p>
               </div>
               
-              <div className="relative w-full lg:max-w-md group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+              <div className="relative w-full group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
                 <input
                   type="text"
                   placeholder="검색어를 입력해 주세요..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all shadow-sm font-medium text-sm"
+                  className="w-full min-h-11 pl-12 pr-4 py-2.5 rounded-2xl bg-white dark:bg-neutral-900 border border-[#d5e2f0] dark:border-neutral-700 text-base text-[#172b4d] dark:text-neutral-100 placeholder:text-slate-400 hover:border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none transition-colors"
                   id="search-input"
                 />
               </div>
+            </div>
+          )}
+
+          {activeView === 'services' && (
+            <div className="flex flex-wrap gap-2" aria-label="앱 카테고리">
+              <button
+                onClick={() => { setActiveView('services'); setSearchQuery(''); }}
+                aria-pressed={!searchQuery}
+                className={`min-h-9 rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${!searchQuery ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-200 bg-slate-50 text-[#172b4d] hover:border-blue-200 hover:bg-blue-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300'}`}
+              >전체</button>
+              {categories.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => { setActiveView('services'); setSearchQuery(c); }}
+                  aria-pressed={searchQuery === c}
+                  className={`min-h-9 max-w-full break-words rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${searchQuery === c ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-200 bg-slate-50 text-[#172b4d] hover:border-blue-200 hover:bg-blue-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300'}`}
+                >{c}</button>
+              ))}
             </div>
           )}
 
@@ -424,7 +469,7 @@ export default function App() {
             </div>
           )}
 
-          <div className="min-h-[400px]">
+          <div className={activeView === 'services' ? 'min-h-0' : 'min-h-[400px]'}>
             {activeView === 'services' && (
               firestoreError ? (
                 <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-2xl p-8 text-center max-w-2xl mx-auto my-12 shadow-sm">
@@ -444,20 +489,46 @@ export default function App() {
                   <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div id="services-grid-wrapper">
+                <div id="services-grid-wrapper" className="space-y-3 pb-2">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-sm font-medium text-slate-600 dark:text-neutral-400">
+                      검색 결과 <span className="font-semibold text-[#172b4d] dark:text-white">{filteredServices.length}</span>개
+                    </p>
+                    <div className="inline-flex shrink-0 gap-1 rounded-xl border border-blue-100 bg-white p-1 dark:border-neutral-800 dark:bg-neutral-900">
+                    <button
+                      onClick={() => setViewMode('grid')}
+                      className={`flex h-8 w-9 items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${
+                        viewMode === 'grid' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-200' : 'text-slate-500 hover:bg-blue-50 hover:text-blue-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-blue-300'
+                      }`}
+                      title="그리드 뷰"
+                    >
+                      <LayoutGrid className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`flex h-8 w-9 items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${
+                        viewMode === 'list' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-200' : 'text-slate-500 hover:bg-blue-50 hover:text-blue-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-blue-300'
+                      }`}
+                      title="리스트 뷰"
+                    >
+                      <List className="w-4 h-4" />
+                    </button>
+                    </div>
+                  </div>
                   {filteredServices.length > 0 ? (
                     <div
                       className={
                         viewMode === 'grid' 
-                          ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6"
-                          : "flex flex-col gap-4"
+                          ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-stretch gap-3 xl:gap-4"
+                          : "flex flex-col gap-3"
                       }
                       id="services-container"
                     >
                       {filteredServices.map((service: AppService) => (
                         <AppCard 
                           key={service.id} 
-                          service={service} 
+                          service={service}
+                          viewMode={viewMode}
                           onEdit={handleEditClick}
                           onDelete={handleDeleteService} 
                         />
@@ -512,9 +583,9 @@ export default function App() {
             )}
           </div>
 
-          <footer className="py-10 mt-10 border-t border-slate-200 dark:border-neutral-900 flex flex-col sm:flex-row justify-between items-center gap-6 text-slate-400">
+          <footer className={`py-6 border-t border-[#dce7f3] dark:border-neutral-900 flex flex-col sm:flex-row flex-wrap justify-between items-center gap-4 text-slate-500 ${activeView === 'services' ? 'mt-2' : 'mt-6'}`}>
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-              <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest">
+              <div className="flex items-center gap-1.5 text-xs font-medium">
                 <span>© 2026</span>
                 <span className="text-slate-300 flex items-center justify-center">/</span>
                 <span>보스코쌤의 학교생활 포털</span>
@@ -523,7 +594,7 @@ export default function App() {
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => setActiveView('inquiry')}
-                  className="text-[10px] font-bold uppercase tracking-widest hover:text-indigo-500 transition-colors cursor-pointer"
+                  className="text-xs font-medium hover:text-blue-600 transition-colors cursor-pointer"
                 >
                   오류 및 문의 제보
                 </button>
@@ -531,14 +602,14 @@ export default function App() {
                 {!user ? (
                   <button 
                     onClick={handleLogin}
-                    className="text-[10px] font-bold uppercase tracking-widest hover:text-indigo-500 transition-colors cursor-pointer"
+                    className="text-xs font-medium hover:text-blue-600 transition-colors cursor-pointer"
                   >
                     관리자 로그인
                   </button>
                 ) : (
                   <button 
                     onClick={handleLogout}
-                    className="text-[10px] font-bold uppercase tracking-widest hover:text-red-500 transition-colors cursor-pointer"
+                    className="text-xs font-medium hover:text-red-500 transition-colors cursor-pointer"
                   >
                     로그아웃
                   </button>

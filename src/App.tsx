@@ -277,7 +277,7 @@ export default function App() {
           <nav className={activeView === 'services' ? 'space-y-6' : 'space-y-7'}>
             {activeView === 'services' && (
               <div className="flex items-center gap-3 px-2 pb-2">
-                <BookOpen aria-hidden="true" className="h-10 w-10 shrink-0 text-blue-600" strokeWidth={1.8} />
+                <BookOpen aria-hidden="true" className="h-10 w-10 shrink-0 text-[#1677ed]" strokeWidth={1.8} />
                 <div>
                   <p className="text-xl font-extrabold tracking-tight text-[#081b4b] dark:text-white">보스코쌤</p>
                   <p className="mt-1 text-xs text-slate-500 dark:text-neutral-400">학교생활 도구 모음</p>
@@ -291,7 +291,7 @@ export default function App() {
                   onClick={() => { setActiveView('services'); setSearchQuery(''); }}
                   className={`w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-2.5 transition-colors text-sm ${
                     activeView === 'services' && !searchQuery
-                      ? 'bg-blue-600 text-white dark:bg-blue-600'
+                      ? 'bg-[#1677ed] text-white dark:bg-[#1677ed]'
                       : 'text-slate-700 dark:text-neutral-300 hover:bg-slate-100/70 dark:hover:bg-neutral-800/40'
                   }`}
                 >
@@ -302,7 +302,7 @@ export default function App() {
                   onClick={() => setActiveView('inquiry')}
                   className={`w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-2.5 transition-colors text-sm ${
                     activeView === 'inquiry'
-                      ? 'bg-blue-600 text-white dark:bg-blue-600'
+                      ? 'bg-[#1677ed] text-white dark:bg-[#1677ed]'
                       : 'text-slate-700 dark:text-neutral-300 hover:bg-slate-100/70 dark:hover:bg-neutral-800/40'
                   }`}
                 >
@@ -424,7 +424,7 @@ export default function App() {
               </div>
               
               <div className="relative w-full group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#1677ed] transition-colors" />
                 <input
                   type="text"
                   placeholder="검색어를 입력해 주세요..."
@@ -442,14 +442,14 @@ export default function App() {
               <button
                 onClick={() => { setActiveView('services'); setSearchQuery(''); }}
                 aria-pressed={!searchQuery}
-                className={`min-h-9 rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${!searchQuery ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-200 bg-slate-50 text-[#172b4d] hover:border-blue-200 hover:bg-blue-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300'}`}
+                className={`min-h-9 rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${!searchQuery ? 'border-[#1677ed] bg-[#1677ed] text-white' : 'border-slate-200 bg-slate-50 text-[#172b4d] hover:border-blue-200 hover:bg-blue-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300'}`}
               >전체</button>
               {categories.map((c) => (
                 <button
                   key={c}
                   onClick={() => { setActiveView('services'); setSearchQuery(c); }}
                   aria-pressed={searchQuery === c}
-                  className={`min-h-9 max-w-full break-words rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${searchQuery === c ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-200 bg-slate-50 text-[#172b4d] hover:border-blue-200 hover:bg-blue-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300'}`}
+                  className={`min-h-9 max-w-full break-words rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${searchQuery === c ? 'border-[#1677ed] bg-[#1677ed] text-white' : 'border-slate-200 bg-slate-50 text-[#172b4d] hover:border-blue-200 hover:bg-blue-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300'}`}
                 >{c}</button>
               ))}
             </div>
@@ -594,7 +594,7 @@ export default function App() {
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => setActiveView('inquiry')}
-                  className="text-xs font-medium hover:text-blue-600 transition-colors cursor-pointer"
+                  className="text-xs font-medium hover:text-[#1677ed] transition-colors cursor-pointer"
                 >
                   오류 및 문의 제보
                 </button>
@@ -602,7 +602,7 @@ export default function App() {
                 {!user ? (
                   <button 
                     onClick={handleLogin}
-                    className="text-xs font-medium hover:text-blue-600 transition-colors cursor-pointer"
+                    className="text-xs font-medium hover:text-[#1677ed] transition-colors cursor-pointer"
                   >
                     관리자 로그인
                   </button>
